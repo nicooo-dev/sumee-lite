@@ -28,7 +28,17 @@ jobs:
         run: |
           xcodebuild -project SUMEE!.xcodeproj \
             -target "SUMEE!" \
-            -configuration Release \
+            -configuration Debug \
+            -destination generic/platform=iOS \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=NO \
+            OTHER_CFLAGS="-fmodules" \
+            build || \
+          echo "Build failed - trying clean build" && \
+          xcodebuild clean && \
+          xcodebuild -project SUMEE!.xcodeproj \
+            -target "SUMEE!" \
+            -configuration Debug \
             -destination generic/platform=iOS \
             CODE_SIGNING_ALLOWED=NO \
             ONLY_ACTIVE_ARCH=NO \
@@ -37,8 +47,8 @@ jobs:
       - name: Create IPA manually
         run: |
           mkdir -p Payload
-          cp -R ~/Library/Developer/Xcode/DerivedData/*/Build/Products/Release-iphoneos/SUMEE!.app Payload/ || \
-          cp -R ~/Library/Developer/Xcode/DerivedData/SUMEE\!-*/Build/Products/Release-iphoneos/SUMEE!.app Payload/ || \
+          cp -R ~/Library/Developer/Xcode/DerivedData/*/Build/Products/Debug-iphoneos/SUMEE!.app Payload/ || \
+          cp -R ~/Library/Developer/Xcode/DerivedData/SUMEE\!-*/Build/Products/Debug-iphoneos/SUMEE!.app Payload/ || \
           echo "App not found in expected location"
           zip -r SUMEE-Lite.ipa Payload/
           ls -la *.ipa
