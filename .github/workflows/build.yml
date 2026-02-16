@@ -71,41 +71,39 @@ jobs:
           if [ -f sumee/Info.plist ]; then
             cp sumee/Info.plist Payload/SUMEE!.app/Info.plist
           else
-            # Create minimal Info.plist
-            cat > Payload/SUMEE!.app/Info.plist << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleExecutable</key>
-    <string>SUMEE</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.sumee.lite</string>
-    <key>CFBundleInfoDictionaryVersion</key>
-    <string>6.0</string>
-    <key>CFBundleName</key>
-    <string>SUMEE!</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
-    <key>CFBundleVersion</key>
-    <string>1</string>
-    <key>LSRequiresIPhoneOS</key>
-    <true/>
-    <key>UIRequiredDeviceCapabilities</key>
-    <array>
-        <string>armv7</string>
-    </array>
-    <key>UISupportedInterfaceOrientations</key>
-    <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationLandscapeLeft</string>
-        <string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
-</dict>
-</plist>
-EOF
+            # Create minimal Info.plist using echo
+            echo '<?xml version="1.0" encoding="UTF-8"?>' > Payload/SUMEE!.app/Info.plist
+            echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >> Payload/SUMEE!.app/Info.plist
+            echo '<plist version="1.0">' >> Payload/SUMEE!.app/Info.plist
+            echo '<dict>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <key>CFBundleExecutable</key>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <string>SUMEE</string>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <key>CFBundleIdentifier</key>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <string>com.sumee.lite</string>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <key>CFBundleInfoDictionaryVersion</key>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <string>6.0</string>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <key>CFBundleName</key>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <string>SUMEE!</string>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <key>CFBundlePackageType</key>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <string>APPL</string>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <key>CFBundleShortVersionString</key>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <string>1.0</string>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <key>CFBundleVersion</key>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <string>1</string>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <key>LSRequiresIPhoneOS</key>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <true/>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <key>UIRequiredDeviceCapabilities</key>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <array>' >> Payload/SUMEE!.app/Info.plist
+            echo '        <string>armv7</string>' >> Payload/SUMEE!.app/Info.plist
+            echo '    </array>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <key>UISupportedInterfaceOrientations</key>' >> Payload/SUMEE!.app/Info.plist
+            echo '    <array>' >> Payload/SUMEE!.app/Info.plist
+            echo '        <string>UIInterfaceOrientationPortrait</string>' >> Payload/SUMEE!.app/Info.plist
+            echo '        <string>UIInterfaceOrientationLandscapeLeft</string>' >> Payload/SUMEE!.app/Info.plist
+            echo '        <string>UIInterfaceOrientationLandscapeRight</string>' >> Payload/SUMEE!.app/Info.plist
+            echo '    </array>' >> Payload/SUMEE!.app/Info.plist
+            echo '</dict>' >> Payload/SUMEE!.app/Info.plist
+            echo '</plist>' >> Payload/SUMEE!.app/Info.plist
           fi
           
           # Copy resources
