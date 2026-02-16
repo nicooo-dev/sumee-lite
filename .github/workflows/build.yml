@@ -60,7 +60,23 @@ jobs:
           else
             echo "Creating minimal iOS app binary"
             # Create a simple working binary using swiftc like imgtool
-            echo 'import UIKit; import Foundation; class AppDelegate: UIResponder, UIApplicationDelegate { func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool { return true } } @main struct App { static func main() { UIApplicationMain(CommandLine.argc, CommandLine.unsafeArgv, nil, NSStringFromClass(AppDelegate.self)) } }' > /tmp/App.swift
+            cat > /tmp/App.swift << 'EOF'
+import UIKit
+import Foundation
+
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        return true
+    }
+}
+
+@main
+struct App {
+    static func main() {
+        UIApplicationMain(CommandLine.argc, CommandLine.unsafeArgv, nil, NSStringFromClass(AppDelegate.self))
+    }
+}
+EOF
             swiftc -o Payload/SUMEE!.app/SUMEE \
               -sdk $(xcrun --sdk iphoneos --show-sdk-path) \
               -target arm64-apple-ios15.0 \
