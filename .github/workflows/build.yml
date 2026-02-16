@@ -27,39 +27,19 @@ jobs:
       - name: Build for Any iOS Device (arm64)
         run: |
           xcodebuild -project SUMEE!.xcodeproj \
-            -scheme "SUMEE!" \
+            -target "SUMEE!" \
             -configuration Release \
             -destination generic/platform=iOS \
-            -archivePath SUMEE.xcarchive \
+            -derivedDataPath DerivedData \
             CODE_SIGNING_ALLOWED=NO \
-            archive
+            ONLY_ACTIVE_ARCH=NO \
+            build
 
-      - name: Export IPA
+      - name: Create IPA manually
         run: |
-          xcodebuild -exportArchive \
-            -archivePath SUMEE.xcarchive \
-            -exportPath . \
-            -exportOptionsPlist <(cat <<EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>development</string>
-            <key>signingStyle</key>
-            <string>none</string>
-            <key>stripSwiftSymbols</key>
-            <true/>
-            <key>thinning</key>
-            <string>&lt;none&gt;</string>
-          </dict>
-          </plist>
-          EOF
-          )
-
-      - name: Find and rename IPA
-        run: |
-          find . -name "*.ipa" -exec cp {} SUMEE-Lite.ipa \;
+          mkdir -p Payload
+          cp -R DerivedData/Build/Products/Release-iphoneos/SUMEE!.app Payload/
+          zip -r SUMEE-Lite.ipa Payload/
           ls -la *.ipa
 
       - name: Upload IPA artifact
