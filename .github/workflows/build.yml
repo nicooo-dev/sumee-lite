@@ -13,7 +13,10 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-      
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
       - name: Compile Metal Shaders
         run: |
           mkdir -p build
@@ -23,12 +26,22 @@ jobs:
       - name: Force Compile Binary
         run: |
           mkdir -p build/Release-iphoneos
-          find sumee -name "*.swift" -not -path "*/GBAKit/*" -not -path "*/SNESKit/*" -not -path "*/NESKit/*" -not -path "*/PSXKit/*" -not -path "*/DSKit/*" -not -path "*/PicoDriveKit/*" > swift_files.txt
+          IOS_SDK=$(xcrun --sdk iphoneos --show-sdk-path)
+          echo "Using SDK: $IOS_SDK"
+
+          find sumee -name "*.swift" \
+            -not -path "*/GBAKit/*" \
+            -not -path "*/SNESKit/*" \
+            -not -path "*/NESKit/*" \
+            -not -path "*/PSXKit/*" \
+            -not -path "*/DSKit/*" \
+            -not -path "*/PicoDriveKit/*" > swift_files.txt
           
           if [ -s swift_files.txt ]; then
             echo "Compiling $(wc -l < swift_files.txt) Swift files..."
-            swiftc -o build/Release-iphoneos/SUMEE \
-              -sdk $(xcrun --sdk iphoneos --show-sdk-path) \
+            xcrun --sdk iphoneos swiftc \
+              -o build/Release-iphoneos/SUMEE \
+              -sdk "$IOS_SDK" \
               -target arm64-apple-ios15.0 \
               -O \
               -framework Foundation \
@@ -48,9 +61,9 @@ jobs:
       
       - name: Manual File Injection
         run: |
+          IOS_SDK=$(xcrun --sdk iphoneos --show-sdk-path)
           mkdir -p Payload/SUMEE.app
           
-          # Copy binary if it exists
           if [ -f build/Release-iphoneos/SUMEE ]; then
             cp build/Release-iphoneos/SUMEE Payload/SUMEE.app/SUMEE
             chmod 755 Payload/SUMEE.app/SUMEE
@@ -58,18 +71,19 @@ jobs:
           else
             echo "Creating minimal iOS app binary"
             cat > /tmp/App.swift << 'EOF'
-          import UIKit
+import UIKit
 
-          class AppDelegate: UIResponder, UIApplicationDelegate {
-              func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-                  return true
-              }
-          }
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        return true
+    }
+}
 
-          UIApplicationMain(CommandLine.argc, CommandLine.unsafeArgv, nil, NSStringFromClass(AppDelegate.self))
-          EOF
-            swiftc -o Payload/SUMEE.app/SUMEE \
-              -sdk $(xcrun --sdk iphoneos --show-sdk-path) \
+UIApplicationMain(CommandLine.argc, CommandLine.unsafeArgv, nil, NSStringFromClass(AppDelegate.self))
+EOF
+            xcrun --sdk iphoneos swiftc \
+              -o Payload/SUMEE.app/SUMEE \
+              -sdk "$IOS_SDK" \
               -target arm64-apple-ios15.0 \
               -O \
               -framework Foundation \
@@ -86,41 +100,41 @@ jobs:
             cp sumee/Info.plist Payload/SUMEE.app/Info.plist
           else
             cat > Payload/SUMEE.app/Info.plist << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>CFBundleExecutable</key>
-              <string>SUMEE</string>
-              <key>CFBundleIdentifier</key>
-              <string>com.sumee.lite</string>
-              <key>CFBundleInfoDictionaryVersion</key>
-              <string>6.0</string>
-              <key>CFBundleName</key>
-              <string>SUMEE</string>
-              <key>CFBundlePackageType</key>
-              <string>APPL</string>
-              <key>CFBundleShortVersionString</key>
-              <string>1.0</string>
-              <key>CFBundleVersion</key>
-              <string>1</string>
-              <key>LSRequiresIPhoneOS</key>
-              <true/>
-              <key>MinimumOSVersion</key>
-              <string>15.0</string>
-              <key>UIRequiredDeviceCapabilities</key>
-              <array>
-                  <string>arm64</string>
-              </array>
-              <key>UISupportedInterfaceOrientations</key>
-              <array>
-                  <string>UIInterfaceOrientationPortrait</string>
-                  <string>UIInterfaceOrientationLandscapeLeft</string>
-                  <string>UIInterfaceOrientationLandscapeRight</string>
-              </array>
-          </dict>
-          </plist>
-          EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key>
+    <string>SUMEE</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.sumee.lite</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>SUMEE</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+    <key>MinimumOSVersion</key>
+    <string>15.0</string>
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>arm64</string>
+    </array>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+</dict>
+</plist>
+EOF
           fi
           
           # Copy resources
