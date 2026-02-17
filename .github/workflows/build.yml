@@ -48,12 +48,12 @@ jobs:
       
       - name: Manual File Injection
         run: |
-          mkdir -p Payload/SUMEE!.app
+          mkdir -p Payload/SUMEE.app
           
           # Copy binary if it exists
           if [ -f build/Release-iphoneos/SUMEE ]; then
-            cp build/Release-iphoneos/SUMEE Payload/SUMEE!.app/SUMEE
-            chmod 755 Payload/SUMEE!.app/SUMEE
+            cp build/Release-iphoneos/SUMEE Payload/SUMEE.app/SUMEE
+            chmod 755 Payload/SUMEE.app/SUMEE
             echo "Binary copied successfully"
           else
             echo "Creating minimal iOS app binary"
@@ -68,24 +68,24 @@ jobs:
 
           UIApplicationMain(CommandLine.argc, CommandLine.unsafeArgv, nil, NSStringFromClass(AppDelegate.self))
           EOF
-            swiftc -o Payload/SUMEE!.app/SUMEE \
+            swiftc -o Payload/SUMEE.app/SUMEE \
               -sdk $(xcrun --sdk iphoneos --show-sdk-path) \
               -target arm64-apple-ios15.0 \
               -O \
               -framework Foundation \
               -framework UIKit \
               /tmp/App.swift
-            chmod 755 Payload/SUMEE!.app/SUMEE
+            chmod 755 Payload/SUMEE.app/SUMEE
           fi
           
           # Copy Metal libraries
-          cp build/*.metallib Payload/SUMEE!.app/ 2>/dev/null || echo "No Metal libs to copy"
+          cp build/*.metallib Payload/SUMEE.app/ 2>/dev/null || echo "No Metal libs to copy"
           
           # Copy Info.plist if exists
           if [ -f sumee/Info.plist ]; then
-            cp sumee/Info.plist Payload/SUMEE!.app/Info.plist
+            cp sumee/Info.plist Payload/SUMEE.app/Info.plist
           else
-            cat > Payload/SUMEE!.app/Info.plist << 'EOF'
+            cat > Payload/SUMEE.app/Info.plist << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -97,7 +97,7 @@ jobs:
               <key>CFBundleInfoDictionaryVersion</key>
               <string>6.0</string>
               <key>CFBundleName</key>
-              <string>SUMEE!</string>
+              <string>SUMEE</string>
               <key>CFBundlePackageType</key>
               <string>APPL</string>
               <key>CFBundleShortVersionString</key>
@@ -106,9 +106,11 @@ jobs:
               <string>1</string>
               <key>LSRequiresIPhoneOS</key>
               <true/>
+              <key>MinimumOSVersion</key>
+              <string>15.0</string>
               <key>UIRequiredDeviceCapabilities</key>
               <array>
-                  <string>armv7</string>
+                  <string>arm64</string>
               </array>
               <key>UISupportedInterfaceOrientations</key>
               <array>
@@ -122,8 +124,8 @@ jobs:
           fi
           
           # Copy resources
-          find sumee -name "*.png" -exec cp {} Payload/SUMEE!.app/ \; 2>/dev/null || echo "No PNG files to copy"
-          find sumee -name "*.jpg" -exec cp {} Payload/SUMEE!.app/ \; 2>/dev/null || echo "No JPG files to copy"
+          find sumee -name "*.png" -exec cp {} Payload/SUMEE.app/ \; 2>/dev/null || echo "No PNG files to copy"
+          find sumee -name "*.jpg" -exec cp {} Payload/SUMEE.app/ \; 2>/dev/null || echo "No JPG files to copy"
           
           zip -qry SUMEE-Lite.ipa Payload
           ls -la SUMEE-Lite.ipa
